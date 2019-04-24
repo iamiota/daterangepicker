@@ -33,7 +33,7 @@
 
         //default settings for options
         this.parentEl = 'body';
-        this.element = $(element);
+        this.element = options.targetEl ? $(options.targetEl) : $(element);
         this.startDate = moment().startOf('day');
         this.endDate = moment().endOf('day');
         this.minDate = false;
