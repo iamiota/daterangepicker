@@ -33,7 +33,8 @@
 
         //default settings for options
         this.parentEl = 'body';
-        this.element = options.targetEl ? $(options.targetEl) : $(element);
+        this.targetEl = options.targetEl ? $(options.targetEl) : $(element);
+        this.element = $(element);
         this.startDate = moment().startOf('day');
         this.endDate = moment().endOf('day');
         this.minDate = false;
@@ -55,7 +56,6 @@
         this.autoUpdateInput = true;
         this.alwaysShowCalendars = false;
         this.ranges = {};
-
         this.opens = 'right';
         if (this.element.hasClass('pull-right'))
             this.opens = 'left';
@@ -641,22 +641,24 @@
             calendar.firstDay = firstDay;
             calendar.lastDay = lastDay;
 
-            for (var i = 0; i < 6; i++) {
+            for (var i = 0; i < 5; i++) {
                 calendar[i] = [];
             }
 
             //populate the calendar with date objects
             var startDay = daysInLastMonth - dayOfWeek + this.locale.firstDay + 1;
-            if (startDay > daysInLastMonth)
+            if (startDay > daysInLastMonth) {
                 startDay -= 7;
-
-            if (dayOfWeek == this.locale.firstDay)
-                startDay = daysInLastMonth - 6;
+            }
 
             var curDate = moment([lastYear, lastMonth, startDay, 12, minute, second]);
-
+            if (dayOfWeek == this.locale.firstDay){
+                startDay = 1;
+                curDate = moment([year, month, startDay, 12, minute, second]);
+            }
+            console.log(lastYear, lastMonth, startDay, 12, minute, second)
             var col, row;
-            for (var i = 0, col = 0, row = 0; i < 42; i++, col++, curDate = moment(curDate).add(24, 'hour')) {
+            for (var i = 0, col = 0, row = 0; i < 35; i++, col++, curDate = moment(curDate).add(24, 'hour')) {
                 if (i > 0 && col % 7 === 0) {
                     col = 0;
                     row++;
@@ -770,7 +772,7 @@
                 }
             }
 
-            for (var row = 0; row < 6; row++) {
+            for (var row = 0; row < 5; row++) {
                 html += '<tr>';
 
                 // add week number
@@ -807,13 +809,23 @@
                     if (this.isInvalidDate(calendar[row][col]))
                         classes.push('off', 'disabled');
 
+                    var inRangeLen = document.querySelectorAll('.in-range').length
+
                     //highlight the currently selected start date
-                    if (calendar[row][col].format('YYYY-MM-DD') == this.startDate.format('YYYY-MM-DD'))
+                    if (calendar[row][col].format('YYYY-MM-DD') == this.startDate.format('YYYY-MM-DD')) {
+                        if (this.startDate && this.endDate || inRangeLen > 1) {
+                            classes.push('select-done');
+                        } else {
+                            document.querySelector('.select-done').classList.remove('select-done')
+                        }
                         classes.push('active', 'start-date');
+                    }
+
 
                     //highlight the currently selected end date
-                    if (this.endDate != null && calendar[row][col].format('YYYY-MM-DD') == this.endDate.format('YYYY-MM-DD'))
-                        classes.push('active', 'end-date');
+                    if (this.endDate != null && calendar[row][col].format('YYYY-MM-DD') == this.endDate.format('YYYY-MM-DD')) {
+                        classes.push('active', 'end-date', 'select-done');
+                    }
 
                     //highlight dates in-between the selected dates
                     if (this.endDate != null && calendar[row][col] > this.startDate && calendar[row][col] < this.endDate)
@@ -1034,9 +1046,9 @@
             }
 
             if (this.drops == 'up')
-                containerTop = this.element.offset().top - this.container.outerHeight() - parentOffset.top;
+                containerTop = this.targetEl.offset().top - this.container.outerHeight() - parentOffset.top;
             else
-                containerTop = this.element.offset().top + this.element.outerHeight() - parentOffset.top;
+                containerTop = this.targetEl.offset().top + this.targetEl.outerHeight() - parentOffset.top;
 
             // Force the container to it's actual width
             this.container.css({
@@ -1049,7 +1061,7 @@
             this.container[this.drops == 'up' ? 'addClass' : 'removeClass']('drop-up');
 
             if (this.opens == 'left') {
-                var containerRight = parentRightEdge - this.element.offset().left - this.element.outerWidth();
+                var containerRight = parentRightEdge - this.targetEl.offset().left - this.targetEl.outerWidth();
                 if (containerWidth + containerRight > $(window).width()) {
                     this.container.css({
                         top: containerTop,
@@ -1064,7 +1076,7 @@
                     });
                 }
             } else if (this.opens == 'center') {
-                var containerLeft = this.element.offset().left - parentOffset.left + this.element.outerWidth() / 2
+                var containerLeft = this.targetEl.offset().left - parentOffset.left + this.targetEl.outerWidth() / 2
                                         - containerWidth / 2;
                 if (containerLeft < 0) {
                     this.container.css({
@@ -1086,7 +1098,7 @@
                     });
                 }
             } else {
-                var containerLeft = this.element.offset().left - parentOffset.left;
+                var containerLeft = this.targetEl.offset().left - parentOffset.left;
                 if (containerLeft + containerWidth > $(window).width()) {
                     this.container.css({
                         top: containerTop,
@@ -1267,7 +1279,13 @@
                     } else {
                         $(el).removeClass('in-range');
                     }
-
+                    var inRangeLen = document.querySelectorAll('.in-range').length
+                    if (startDate && inRangeLen > 1) {
+                        document.querySelector('.start-date').classList.add('select-done');
+                    }
+                    if (inRangeLen === 1) {
+                        document.querySelector('.start-date').classList.remove('select-done');
+                    }
                 });
             }
 
