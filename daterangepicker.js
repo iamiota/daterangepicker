@@ -656,7 +656,6 @@
                 startDay = 1;
                 curDate = moment([year, month, startDay, 12, minute, second]);
             }
-            console.log(lastYear, lastMonth, startDay, 12, minute, second)
             var col, row;
             for (var i = 0, col = 0, row = 0; i < 35; i++, col++, curDate = moment(curDate).add(24, 'hour')) {
                 if (i > 0 && col % 7 === 0) {
@@ -809,14 +808,16 @@
                     if (this.isInvalidDate(calendar[row][col]))
                         classes.push('off', 'disabled');
 
-                    var inRangeLen = document.querySelectorAll('.in-range').length
+                    var inRangeLen = this.container.find('.in-range').length
 
                     //highlight the currently selected start date
                     if (calendar[row][col].format('YYYY-MM-DD') == this.startDate.format('YYYY-MM-DD')) {
                         if (this.startDate && this.endDate || inRangeLen > 1) {
                             classes.push('select-done');
                         } else {
-                            document.querySelector('.select-done').classList.remove('select-done')
+                            this.container.find('.select-done').each(function (index, dom) {
+                                $(dom).removeClass('select-done')
+                            })
                         }
                         classes.push('active', 'start-date');
                     }
@@ -1166,6 +1167,7 @@
             this.container.hide();
             this.element.trigger('hide.daterangepicker', this);
             this.isShowing = false;
+            // $('.daterangepicker').remove()
         },
 
         toggle: function(e) {
@@ -1262,6 +1264,7 @@
             var leftCalendar = this.leftCalendar;
             var rightCalendar = this.rightCalendar;
             var startDate = this.startDate;
+            var container = this.container;
             if (!this.endDate) {
                 this.container.find('.drp-calendar tbody td').each(function(index, el) {
 
@@ -1279,12 +1282,16 @@
                     } else {
                         $(el).removeClass('in-range');
                     }
-                    var inRangeLen = document.querySelectorAll('.in-range').length
+                    var inRangeLen = container.find('.in-range').length
                     if (startDate && inRangeLen > 1) {
-                        document.querySelector('.start-date').classList.add('select-done');
+                        container.find('.start-date').each(function(index, dom) {
+                            $(dom).addClass('select-done');
+                        })
                     }
                     if (inRangeLen === 1) {
-                        document.querySelector('.start-date').classList.remove('select-done');
+                        container.find('.start-date').each(function(index, dom) {
+                            $(dom).removeClass('select-done');
+                        })
                     }
                 });
             }

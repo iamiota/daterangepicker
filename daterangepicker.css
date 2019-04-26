@@ -206,6 +206,9 @@
 .daterangepicker td.in-range:first-child:not(.start-date) {
   border-radius: 99px 0 0 99px;
 }
+.daterangepicker td.in-range:first-child.end-date {
+  border-radius: 0 99px 99px 0;
+}
 .daterangepicker td.in-range:last-child:not(.start-date) {
   border-radius: 0 99px 99px 0;
 }
@@ -215,7 +218,9 @@
 .daterangepicker td.start-date.select-done {
   border-radius: 99px 0 0 99px;
 }
-
+.daterangepicker .today {
+  color: #386cf6;
+}
 .daterangepicker td.end-date {
   border-radius: 99px;
 }
@@ -224,7 +229,7 @@
 }
 
 .daterangepicker td.start-date.end-date {
-  border-radius: 99px;
+  border-radius: 99px !important;
 }
 
 .daterangepicker td.active, .daterangepicker td.active:hover {
