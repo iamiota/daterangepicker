@@ -453,6 +453,7 @@
 
         updateBox: function () {
             if (this.singleDatePicker) return
+            if (!this.isShowing) return
             if ($('body').width() <= 766) {
                 if (!this.singleDatePickerMobile) {
                     this.singleDatePickerMobile = true
