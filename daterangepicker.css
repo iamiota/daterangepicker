@@ -5,6 +5,7 @@
   border-radius: 4px;
   border: 1px solid #ddd;
   width: 278px;
+  min-width: 276px;
   max-width: none;
   padding: 0;
   margin-top: 7px;
@@ -118,6 +119,9 @@
 .daterangepicker .drp-calendar.left {
   padding: 8px 0 8px 8px;
 }
+.daterangepicker .drp-calendar.left.single {
+  padding: 0;
+}
 
 .daterangepicker .drp-calendar.right {
   padding: 8px;
@@ -136,6 +140,10 @@
   padding: 3px;
 }
 
+.daterangepicker .calendar-table .prev,
+.daterangepicker .calendar-table .next {
+  opacity: 1;
+}
 .daterangepicker .calendar-table .next span {
   transform: rotate(-45deg);
   -webkit-transform: rotate(-45deg);
@@ -145,6 +153,31 @@
   transform: rotate(135deg);
   -webkit-transform: rotate(135deg);
 }
+
+.daterangepicker .calendar-table .prev.has-more span::after {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 4px;
+  background-color: #386cf6;
+  border-radius: 999px;
+  position: absolute;
+  right: 6px;
+  top: -4px;
+}
+
+.daterangepicker .calendar-table .next.has-more span::after {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 4px;
+  background-color: #386cf6;
+  border-radius: 999px;
+  position: absolute;
+  right: 6px;
+  top: -4px;
+}
+
 
 .daterangepicker .calendar-table tr {
   margin-bottom: 4px;
@@ -157,7 +190,7 @@
   height: 28px;
   font-size: 0.88em;
   border-radius: 4px;
-  border: 1px solid transparent;
+/*  border: 1px solid transparent;*/
   white-space: nowrap;
   cursor: pointer;
   font-weight: normal;
@@ -204,32 +237,32 @@
   border-radius: 0;
 }
 .daterangepicker td.in-range:first-child:not(.start-date) {
-  border-radius: 99px 0 0 99px;
+  border-radius: 999px 0 0 999px;
 }
 .daterangepicker td.in-range:first-child.end-date {
-  border-radius: 0 99px 99px 0;
+  border-radius: 0 999px 999px 0;
 }
 .daterangepicker td.in-range:last-child:not(.start-date) {
-  border-radius: 0 99px 99px 0;
+  border-radius: 0 999px 999px 0;
 }
 .daterangepicker td.start-date {
-  border-radius: 99px;
+  border-radius: 999px;
 }
 .daterangepicker td.start-date.select-done {
-  border-radius: 99px 0 0 99px;
+  border-radius: 999px 0 0 999px;
 }
 .daterangepicker .today {
   color: #386cf6;
 }
 .daterangepicker td.end-date {
-  border-radius: 99px;
+  border-radius: 999px;
 }
 .daterangepicker td.end-date.select-done {
-  border-radius: 0 99px 99px 0;
+  border-radius: 0 999px 999px 0;
 }
 
 .daterangepicker td.start-date.end-date {
-  border-radius: 99px !important;
+  border-radius: 999px !important;
 }
 
 .daterangepicker td.active, .daterangepicker td.active:hover {
@@ -292,11 +325,11 @@
 .daterangepicker .drp-buttons {
   clear: both;
   text-align: right;
-  padding: 8px;
-  border-top: 1px solid #ddd;
+  padding: 8px 12px;
   display: none;
-  line-height: 12px;
+  height: 56px;
   vertical-align: middle;
+  background-color: #fafafa;
 }
 
 .daterangepicker .drp-selected {
@@ -306,9 +339,7 @@
 }
 
 .daterangepicker .drp-buttons .btn {
-  margin-left: 8px;
-  font-size: 12px;
-  font-weight: bold;
+  font-size: 0.77em;
   padding: 4px 8px;
 }
 
@@ -361,7 +392,7 @@
 }
 
 /*  Larger Screen Styling */
-@media (min-width: 564px) {
+/*@media (min-width: 564px) {*/
   .daterangepicker {
     width: auto;
   }
@@ -379,7 +410,9 @@
   }
 
   .daterangepicker.single .ranges, .daterangepicker.single .drp-calendar {
-    float: left;
+/*    float: left;*/
+    margin: 0 auto !important;
+    width: 196px;
   }
 
   .daterangepicker {
@@ -412,10 +445,14 @@
     padding-right: 8px;
   }
 
+  .daterangepicker .drp-calendar.left.single .calendar-table {
+    padding-right: 0;
+  }
+
   .daterangepicker .ranges, .daterangepicker .drp-calendar {
     float: left;
   }
-}
+/*}*/
 
 @media (min-width: 730px) {
   .daterangepicker .ranges {
@@ -433,4 +470,24 @@
   .daterangepicker .drp-calendar.left {
     clear: none !important;
   }
+}
+
+.daterangepicker .applyBtn {
+  width: 114px;
+  height: 40px;
+  border-radius: 6px;
+  background-color: #eff1f3;
+  font-size: 0.77em;
+  color: #386cf6;
+  font-weight: bold;
+  margin-left: 16px;
+}
+.daterangepicker .cancelBtn {
+  width: 114px;
+  height: 40px;
+  border-radius: 6px;
+  border: solid 1px #ebebeb;
+  background-color: #ffffff;
+  font-size: 0.77em;
+  color: #5e6163;
 }

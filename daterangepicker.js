@@ -42,6 +42,7 @@
         this.maxSpan = false;
         this.autoApply = false;
         this.singleDatePicker = false;
+        this.singleDatePickerMobile = $('body').width() <= 766;
         this.showDropdowns = false;
         this.minYear = moment().subtract(100, 'year').format('YYYY');
         this.maxYear = moment().add(100, 'year').format('YYYY');
@@ -300,7 +301,7 @@
                 if (split.length == 2) {
                     start = moment(split[0], this.locale.format);
                     end = moment(split[1], this.locale.format);
-                } else if (this.singleDatePicker && val !== "") {
+                } else if ((this.singleDatePickerMobile || this.singleDatePicker) && val !== "") {
                     start = moment(val, this.locale.format);
                     end = moment(val, this.locale.format);
                 }
@@ -381,17 +382,17 @@
         if (typeof options.ranges === 'object')
             this.container.addClass('show-ranges');
 
-        if (this.singleDatePicker) {
+        if (this.singleDatePicker || this.singleDatePickerMobile) {
             this.container.addClass('single');
             this.container.find('.drp-calendar.left').addClass('single');
             this.container.find('.drp-calendar.left').show();
             this.container.find('.drp-calendar.right').hide();
-            if (!this.timePicker) {
+            if (!this.timePicker && !this.singleDatePickerMobile) {
                 this.container.addClass('auto-apply');
             }
         }
 
-        if ((typeof options.ranges === 'undefined' && !this.singleDatePicker) || this.alwaysShowCalendars) {
+        if ((typeof options.ranges === 'undefined' && (!this.singleDatePicker || !this.singleDatePickerMobile)) || this.alwaysShowCalendars) {
             this.container.addClass('show-calendar');
         }
 
@@ -443,12 +444,38 @@
         //
 
         this.updateElement();
-
+        window.addEventListener('resize', this.updateBox.bind(this))
     };
 
     DateRangePicker.prototype = {
 
         constructor: DateRangePicker,
+
+        updateBox: function () {
+            if (this.singleDatePicker) return
+            if ($('body').width() <= 766) {
+                if (!this.singleDatePickerMobile) {
+                    this.singleDatePickerMobile = true
+                    this.leftCalendar = _.cloneDeepWith(this.rightCalendar)
+                    this.container.find('.drp-calendar.right').hide()
+                    this.renderCalendar('left')
+                    this.renderCalendar('right')
+                    this.container.addClass('single');
+                    this.container.find('.drp-calendar.left').addClass('single');
+                }
+            } else {
+                if (this.singleDatePickerMobile) {
+                    this.singleDatePickerMobile = false
+                    this.rightCalendar = _.cloneDeepWith(this.leftCalendar)
+                    this.leftCalendar.month.subtract(1, 'month');
+                    this.container.find('.drp-calendar.right').show()
+                    this.renderCalendar('left')
+                    this.renderCalendar('right')
+                    this.container.removeClass('single');
+                    this.container.find('.drp-calendar.left').removeClass('single');
+                }
+            }
+        },
 
         setStartDate: function(startDate) {
             if (typeof startDate === 'string')
@@ -540,7 +567,7 @@
 
         updateMonthsInView: function() {
             if (this.endDate) {
-
+                if (this.leftCalendar.month && this.singleDatePickerMobile) return
                 //if both dates are visible already, do nothing
                 if (!this.singleDatePicker && this.leftCalendar.month && this.rightCalendar.month &&
                     (this.startDate.format('YYYY-MM') == this.leftCalendar.month.format('YYYY-MM') || this.startDate.format('YYYY-MM') == this.rightCalendar.month.format('YYYY-MM'))
@@ -563,14 +590,13 @@
                     this.rightCalendar.month = this.startDate.clone().date(2).add(1, 'month');
                 }
             }
-            if (this.maxDate && this.linkedCalendars && !this.singleDatePicker && this.rightCalendar.month > this.maxDate) {
+            if (this.maxDate && this.linkedCalendars && !this.singleDatePicker && !this.singleDatePickerMobile && this.rightCalendar.month > this.maxDate) {
               this.rightCalendar.month = this.maxDate.clone().date(2);
               this.leftCalendar.month = this.maxDate.clone().date(2).subtract(1, 'month');
             }
         },
 
         updateCalendars: function() {
-
             if (this.timePicker) {
                 var hour, minute, second;
                 if (this.endDate) {
@@ -700,7 +726,11 @@
                 html += '<th></th>';
 
             if ((!minDate || minDate.isBefore(calendar.firstDay)) && (!this.linkedCalendars || side == 'left')) {
-                html += '<th class="prev available"><span></span></th>';
+                html += '<th class="prev available';
+                if (this.startDate && this.startDate.isBefore(calendar.firstDay)) {
+                    html += ' has-more '
+                }
+                html += '"><span></span></th>';
             } else {
                 html += '<th></th>';
             }
@@ -741,8 +771,12 @@
             }
 
             html += '<th colspan="5" class="month">' + dateHtml + '</th>';
-            if ((!maxDate || maxDate.isAfter(calendar.lastDay)) && (!this.linkedCalendars || side == 'right' || this.singleDatePicker)) {
-                html += '<th class="next available"><span></span></th>';
+            if ((!maxDate || maxDate.isAfter(calendar.lastDay)) && (!this.linkedCalendars || side == 'right' || this.singleDatePicker || this.singleDatePickerMobile)) {
+                html += '<th class="next available';
+                if (this.endDate && this.endDate.isAfter(calendar.lastDay)) {
+                    html += ' has-more '
+                }
+                html += '"><span></span></th>';
             } else {
                 html += '<th></th>';
             }
@@ -1026,7 +1060,7 @@
 
         updateFormInputs: function() {
 
-            if (this.singleDatePicker || (this.endDate && (this.startDate.isBefore(this.endDate) || this.startDate.isSame(this.endDate)))) {
+            if (this.singleDatePickerMobile || this.singleDatePicker || (this.endDate && (this.startDate.isBefore(this.endDate) || this.startDate.isSame(this.endDate)))) {
                 this.container.find('button.applyBtn').removeAttr('disabled');
             } else {
                 this.container.find('button.applyBtn').attr('disabled', 'disabled');
@@ -1489,7 +1523,7 @@
                 start.minute(minute);
                 start.second(second);
                 this.setStartDate(start);
-                if (this.singleDatePicker) {
+                if (this.singleDatePicker || this.singleDatePickerMobile) {
                     this.endDate = this.startDate.clone();
                 } else if (this.endDate && this.endDate.format('YYYY-MM-DD') == start.format('YYYY-MM-DD') && this.endDate.isBefore(start)) {
                     this.setEndDate(start.clone());
@@ -1527,7 +1561,7 @@
                 end = moment(dateString[1], this.locale.format);
             }
 
-            if (this.singleDatePicker || start === null || end === null) {
+            if (this.singleDatePickerMobile || this.singleDatePicker || start === null || end === null) {
                 start = moment(this.element.val(), this.locale.format);
                 end = start;
             }
@@ -1557,7 +1591,7 @@
         updateElement: function() {
             if (this.element.is('input') && this.autoUpdateInput) {
                 var newValue = this.startDate.format(this.locale.format);
-                if (!this.singleDatePicker) {
+                if (!this.singleDatePicker || !this.singleDatePickerMobile) {
                     newValue += this.locale.separator + this.endDate.format(this.locale.format);
                 }
                 if (newValue !== this.element.val()) {
