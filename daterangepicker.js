@@ -42,7 +42,7 @@
         this.maxSpan = false;
         this.autoApply = false;
         this.singleDatePicker = false;
-        this.singleDatePickerMobile = $('body').width() <= 766;
+        this.singleDatePickerMobile = $('body').width() <= 768;
         this.showDropdowns = false;
         this.minYear = moment().subtract(100, 'year').format('YYYY');
         this.maxYear = moment().add(100, 'year').format('YYYY');
@@ -454,7 +454,7 @@
         updateBox: function () {
             if (this.singleDatePicker) return
             if (!this.isShowing) return
-            if ($('body').width() <= 766) {
+            if ($('body').width() <= 768) {
                 if (!this.singleDatePickerMobile) {
                     this.singleDatePickerMobile = true
                     this.leftCalendar = _.cloneDeepWith(this.rightCalendar)
@@ -474,6 +474,8 @@
                     this.renderCalendar('right')
                     this.container.removeClass('single');
                     this.container.find('.drp-calendar.left').removeClass('single');
+                    this.updateView()
+                    this.move();
                 }
             }
         },
@@ -829,7 +831,7 @@
 
                     //grey out the dates in other months displayed at beginning and end of this calendar
                     if (calendar[row][col].month() != calendar[1][1].month())
-                        classes.push('off', 'ends');
+                        classes.push('off', 'ends', 'disabled');
 
                     //don't allow selection of dates before the minimum date
                     if (this.minDate && calendar[row][col].isBefore(this.minDate, 'day'))
@@ -1288,6 +1290,7 @@
 
             //ignore dates that can't be selected
             if (!$(e.target).hasClass('available')) return;
+            if (!$(e.target).hasClass('off')) return;
 
             var title = $(e.target).attr('data-title');
             var row = title.substr(1, 1);
