@@ -40,6 +40,7 @@
         this.minDate = false;
         this.maxDate = false;
         this.maxSpan = false;
+        this.hideCb = options.hideCb || null
         this.autoApply = false;
         this.singleDatePicker = false;
         this.singleDatePickerMobile = $('body').width() <= 768;
@@ -774,7 +775,7 @@
             }
 
             html += '<th colspan="5" class="month">' + dateHtml + '</th>';
-            if ((!maxDate || maxDate.isAfter(calendar.lastDay)) && (!this.linkedCalendars || side == 'right' || this.singleDatePicker || this.singleDatePickerMobile)) {
+            if ((!maxDate || maxDate.isAfter(calendar.lastDay.endOf('day'))) && (!this.linkedCalendars || side == 'right' || this.singleDatePicker || this.singleDatePickerMobile)) {
                 html += '<th class="next available';
                 if (this.endDate && this.endDate.isAfter(calendar.lastDay)) {
                     html += ' has-more '
@@ -1204,6 +1205,7 @@
             this.container.hide();
             this.element.trigger('hide.daterangepicker', this);
             this.isShowing = false;
+            if (this.hideCb) this.hideCb()
             // $('.daterangepicker').remove()
         },
 
